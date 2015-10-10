@@ -230,6 +230,9 @@ public class CallFeaturesSetting extends PreferenceActivity
     private static final String BUTTON_CHOOSE_REVERSE_LOOKUP_PROVIDER =
             "button_choose_reverse_lookup_provider";
 
+    // XoplaX OS custom features
+    private static final String BUTTON_CALL_UI_IN_BACKGROUND = "bg_incall_screen";
+
     private Intent mContactListIntent;
 
     /** Event for Async voicemail change call */
@@ -356,6 +359,8 @@ public class CallFeaturesSetting extends PreferenceActivity
     private ListPreference mT9SearchInputLocale;
     private CheckBoxPreference mButtonProximity;
     private ListPreference mCallRecordingFormat;
+    // XoplaX OS
+    private CheckBoxPreference mButtonCallUiInBackground;
 
     private class VoiceMailProvider {
         public VoiceMailProvider(String name, Intent intent) {
@@ -608,6 +613,8 @@ public class CallFeaturesSetting extends PreferenceActivity
             Settings.System.putInt(mPhone.getContext().getContentResolver(),
                     Settings.System.NOISE_SUPPRESSION, nsp);
             return true;
+        } else if (preference == mButtonCallUiInBackground) {
+            return true;
         } else if (preference == mButtonAutoRetry) {
             android.provider.Settings.Global.putInt(mPhone.getContext().getContentResolver(),
                     android.provider.Settings.Global.CALL_AUTO_RETRY,
@@ -729,6 +736,10 @@ public class CallFeaturesSetting extends PreferenceActivity
             int index = mCallRecordingFormat.findIndexOfValue((String) objValue);
             Settings.System.putInt(getContentResolver(), Settings.System.CALL_RECORDING_FORMAT, value);
             mCallRecordingFormat.setSummary(mCallRecordingFormat.getEntries()[index]);
+        } else if (preference == mButtonCallUiInBackground) {
+            Settings.System.putInt(mPhone.getContext().getContentResolver(),
+                Settings.System.CALL_UI_IN_BACKGROUND,
+                (Boolean) objValue ? 1 : 0);
         }
         // always let the preference setting proceed.
         return true;
@@ -1674,6 +1685,9 @@ public class CallFeaturesSetting extends PreferenceActivity
 
         mCallRecordingFormat = (ListPreference) findPreference(CALL_RECORDING_FORMAT);
 
+        // XoplaX OS
+        mButtonCallUiInBackground = (CheckBoxPreference) findPreference(BUTTON_CALL_UI_IN_BACKGROUND);
+
         if (mT9SearchInputLocale != null) {
             initT9SearchInputPreferenceList();
         }
@@ -1741,6 +1755,12 @@ public class CallFeaturesSetting extends PreferenceActivity
             mCallRecordingFormat.setValue(String.valueOf(format));
             mCallRecordingFormat.setSummary(mCallRecordingFormat.getEntry());
             mCallRecordingFormat.setOnPreferenceChangeListener(this);
+        }
+
+
+        // Incoming call ui in bg
+        if (mButtonCallUiInBackground != null) {
+            mButtonCallUiInBackground.setOnPreferenceChangeListener(this);
         }
 
         removeOptionalPrefs(prefSet);
@@ -1912,6 +1932,13 @@ public class CallFeaturesSetting extends PreferenceActivity
             mButtonProximity.setChecked(checked);
             mButtonProximity.setSummary(checked ? R.string.proximity_on_summary
                     : R.string.proximity_off_summary);
+        }
+
+        // Incoming call ui in bg
+        if (mButtonCallUiInBackground != null) {
+            int callUiInBackground = Settings.System.getInt(getContentResolver(),
+                    Settings.System.CALL_UI_IN_BACKGROUND, 1);
+            mButtonCallUiInBackground.setChecked(callUiInBackground != 0);
         }
 
         updateBlacklistSummary();
