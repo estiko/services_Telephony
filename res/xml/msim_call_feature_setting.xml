@@ -124,6 +124,13 @@
             android:persistent="false"
             android:summary="@string/proximity_on_summary" />
 
+    <CheckBoxPreference
+           android:key="bg_incall_screen"
+           android:title="@string/bg_incall"
+           android:persistent="false"
+           android:defaultValue="false"
+           android:summary="@string/bg_incall_summary"/>
+
     <ListPreference
             android:key="button_incoming_call_style"
             android:title="@string/incoming_call_style_title"
